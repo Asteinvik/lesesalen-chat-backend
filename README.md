@@ -1,7 +1,8 @@
 install dependecies:
 
-pip3 install -r requirements.txt
+pip3 install --user -r requirements.txt
 
-run:
+Run:
 
+Add environment variable FLASK_APP = flasktest.py
 python3 -m flask run
