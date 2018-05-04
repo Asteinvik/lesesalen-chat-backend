@@ -30,3 +30,4 @@ build
 
 # Pycharm
 *.iml
+.idea/
