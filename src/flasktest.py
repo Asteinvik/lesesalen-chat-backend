@@ -14,7 +14,7 @@ def index():
 
 @socketio.on('message')
 def handle_message(message):
-    emit('message', {'data': message}, broadcast=True)
+    emit('message', {'data': message}, broadcast=True, include_self=False)
 
 @socketio.on('connect')
 def connect():
