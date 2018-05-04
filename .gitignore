@@ -27,3 +27,7 @@ pip-log.txt
 venv
 *.pyc
 build
+
+# Pycharm
+*.iml
+.idea/
