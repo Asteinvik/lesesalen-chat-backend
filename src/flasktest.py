@@ -15,7 +15,6 @@ def index():
 @socketio.on('message')
 def handle_message(message):
     emit('message', {'data': 'her har du ditt jaevla svar din luring'})
-    print('received message: ' + message['data'])
 
 @socketio.on('connect')
 def connect():
