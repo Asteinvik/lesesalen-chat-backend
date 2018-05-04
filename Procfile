@@ -1,1 +1,1 @@
-web gunicorn --chdir ./src/ flasktest:app
+web gunicorn --worker-class eventlet --chdir ./src/ flasktest:app
