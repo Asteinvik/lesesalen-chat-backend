@@ -14,10 +14,10 @@ def index():
 
 @socketio.on('message')
 def handle_message(message):
+    emit('message', {'data': 'her har du ditt jaevla svar din luring'})
     print('received message: ' + message['data'])
 
 @socketio.on('connect')
 def connect():
     id = 1
     emit('on_connect', {'data': 'You are connected. ID: %d' % id})
-

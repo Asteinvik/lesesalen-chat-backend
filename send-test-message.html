@@ -4,7 +4,7 @@
     socket.on('connect', function() {
         socket.emit('message', {data: 'I\'m connected!'});
     });
-    socket.on('on_connect', function(message) {
+    socket.on('message', function(message) {
         console.log(message)
     })
 </script>
