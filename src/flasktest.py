@@ -59,8 +59,6 @@ class User(db.Model):
         return self._password
 
     def is_correct_password(self, plaintext):
-        print('pass type: %s' % type(plaintext))
-        print('self._pass type: %s' % type(self._password))
         if bcrypt.check_password_hash(self._password.encode('utf-8'), plaintext.encode('utf-8')):
             return True
         return False
@@ -88,10 +86,6 @@ def register():
         password = request.form['password']
         email = request.form['email']
         user = User(username=username, password=password, email=email)
-        print('user:')
-        print(user.username)
-        print(user.password)
-        print(user.email)
         try:
             db.session.add(user)
             db.session.commit()
@@ -160,11 +154,16 @@ def connect():
 @socketio.on('join')
 def on_join(data):
     username = data['username']
-    print('join message. username: %s' % username)
     user=db.session.query(User).filter_by(username=username).first()
     room = rooms[user.id]
     join_room(room)
-    send(username + ' has entered the room.', room=room)
+    message_json = json.dumps({
+        '_id': -1,
+        'text': username + ' has entered the room.',
+        'createdAt': datetime.utcnow(),
+        'system': True,
+    })
+    send(message_json, room=room)
 
 def giveRoom():
     nUsers=db.session.query(User).order_by(User.id).count()
