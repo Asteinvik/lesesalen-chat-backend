@@ -2,7 +2,7 @@ import os
 from flask import Flask, render_template, request, json, Response
 from flask_socketio import SocketIO, send, emit
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
+from flask_login import LoginManager, login_user
 from datetime import datetime
 
 
@@ -42,7 +42,7 @@ class User(db.Model):
         return False
  
     def get_id(self):
-        return unicode(self.id)
+        return str(self.id)
  
     def __repr__(self):
         return '<User %r>' % (self.username)
@@ -98,8 +98,12 @@ def login():
         })
         return Response(js, status = 403, mimetype='application/json')
     login_user(registered_user)
-    flash('Logged in successfully')
-    return redirect(request.args.get('next') or url_for('index'))
+    js = json.dumps({
+        'status': 200,
+        'message': 'Login success',
+        'username': registered_user.username
+    })
+    return Response(js, status = 200, mimetype='application/json')
 
 @socketio.on('message')
 def handle_message(message):
