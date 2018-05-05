@@ -14,6 +14,7 @@ Flask-SQLAlchemy = "*"
 psycopg2-binary = "*"
 psycopg2 = "*"
 flask-login = "*"
+flask-bcrypt = "*"
 
 [requires]
 python_version = "3.5"
