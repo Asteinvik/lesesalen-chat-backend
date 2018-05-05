@@ -19,7 +19,7 @@ login_manager.init_app(app)
 class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
+    username = db.Column(db.String(80), unique=True, nullable=False, index=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password=db.Column(db.String(120))
     registered_on = db.Column('registered_on' , db.DateTime)
@@ -60,6 +60,21 @@ def load_user(id):
     Loads a User object based on id
     '''
     return User.query.get(int(id))
+
+@socketio.on('register')
+def register(user_info):
+    # TODO: Validate input
+    username = user_info['username']
+    password = user_info['password']
+    email = user_info['email']
+    user = User(username, password, email)
+    db.session.add(user)
+    db.session.commit()
+    emit('message', 'Successfully registered user')
+
+@app.route('/login', methods=['GET','POST'])
+def login():
+    return 'login route'
 
 @socketio.on('message')
 def handle_message(message):
