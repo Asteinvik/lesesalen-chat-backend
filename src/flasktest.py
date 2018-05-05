@@ -113,7 +113,7 @@ def login():
             'status': 200,
             'message': 'Login success',
             'username': registered_user.username,
-            '': registered_user.id
+            'id': registered_user.id
         })
         return Response(js, status = 200, mimetype='application/json')
     else:
