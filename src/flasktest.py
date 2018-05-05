@@ -158,10 +158,10 @@ def on_join(data):
     room = rooms[user.id]
     join_room(room)
     message_json = json.dumps({
-        '_id': -1,
+        '_id': '-1',
         'text': username + ' has entered the room.',
         'createdAt': datetime.utcnow(),
-        'system': True,
+        'system': 'true',
     })
     send(message_json, room=room)
 
