@@ -1,6 +1,7 @@
 import os
 import math
 import random as rnd
+import uuid
 from datetime import datetime
 from flask import Flask, render_template, request, json, Response
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
