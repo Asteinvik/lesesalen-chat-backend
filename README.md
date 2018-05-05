@@ -1,8 +1,11 @@
-install dependecies:
+## Configuration
+Add environment variables:
+`FLASK_APP = <absolute-path-to-flasktest.py>`
+`DATABASE_URL = <path-to-postgresdb>`
 
-pip3 install --user -r requirements.txt
+Install dependecies:
+pip3 install --user pipenv
+pipenv install
 
-Run:
-
-Add environment variable FLASK_APP = flasktest.py
-python3 -m flask run
+## Run:
+flask run
