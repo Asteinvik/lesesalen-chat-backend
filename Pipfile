@@ -11,6 +11,8 @@ gunicorn = "==18.0"
 python-dotenv = "*"
 Flask-SocketIO = "*"
 Flask-SQLAlchemy = "*"
+psycopg2-binary = "*"
+psycopg2 = "*"
 
 [requires]
 python_version = "3.5"
