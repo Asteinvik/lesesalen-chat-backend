@@ -54,6 +54,13 @@ if __name__ == '__main__':
 def index():
     return ('hello world!')
 
+@login_manager.user_loader
+def load_user(id):
+    '''
+    Loads a User object based on id
+    '''
+    return User.query.get(int(id))
+
 @socketio.on('message')
 def handle_message(message):
     emit('message', {'data': message}, broadcast=True, include_self=False)
