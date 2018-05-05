@@ -13,6 +13,7 @@ Flask-SocketIO = "*"
 Flask-SQLAlchemy = "*"
 psycopg2-binary = "*"
 psycopg2 = "*"
+flask-login = "*"
 
 [requires]
 python_version = "3.5"
