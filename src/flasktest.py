@@ -114,6 +114,15 @@ def logout():
     })
     return Response(js, status = 200, mimetype='application/json')
 
+@app.route('/secure')
+@login_required
+def secure():
+    js = json.dumps({
+        'status': 200,
+        'message': 'Here is some very secure data!'
+    })
+    return Response(js, status = 200, mimetype='application/json')
+
 @socketio.on('message')
 def handle_message(message):
     emit('message', {'data': message}, broadcast=True, include_self=False)
