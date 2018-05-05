@@ -2,7 +2,7 @@ import os
 from flask import Flask, render_template, request, json, Response
 from flask_socketio import SocketIO, send, emit
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, login_user
+from flask_login import LoginManager, login_user, login_required, logout_user
 from datetime import datetime
 
 
@@ -102,6 +102,15 @@ def login():
         'status': 200,
         'message': 'Login success',
         'username': registered_user.username
+    })
+    return Response(js, status = 200, mimetype='application/json')
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    js = json.dumps({
+        'status': 200,
+        'message': 'Logged out'
     })
     return Response(js, status = 200, mimetype='application/json')
 
