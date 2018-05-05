@@ -1,5 +1,0 @@
-flask-socketio
-eventlet
-gunicorn==18.0
-python-dotenv
-flask_sqlalchemy
