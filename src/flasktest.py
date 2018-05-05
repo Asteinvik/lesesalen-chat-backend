@@ -11,7 +11,7 @@ from flask_bcrypt import Bcrypt
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
-rooms=[]
+rooms = [0]*1000
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -160,6 +160,7 @@ def connect():
 @socketio.on('join')
 def on_join(data):
     username = data['username']
+    print('join message. username: %s' % username)
     user=db.session.query(User).filter_by(username=username).first()
     room = rooms[user.id]
     join_room(room)
@@ -169,7 +170,6 @@ def giveRoom():
     nUsers=db.session.query(User).order_by(User.id).count()
     nRooms=math.ceil(nUsers/2)
     roomspace=(list(range(1,nRooms+1))+list(range(1,nRooms+1)))
-    rooms=[0]*1000
     for user in db.session.query(User).order_by(User.id):
         rooms[user.id]=rnd.choice(roomspace)
         print(user.id,rooms[user.id])
