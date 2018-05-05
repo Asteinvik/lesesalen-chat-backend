@@ -4,13 +4,20 @@ import random as rnd
 import uuid
 from random import randint
 from datetime import datetime
-from flask import Flask, render_template, request, json, Response
-from flask_socketio import SocketIO, send, emit, join_room, leave_room
+from flask import Flask, render_template, request, json, Response, copy_current_request_context
+from flask_socketio import SocketIO, send, emit, join_room, leave_room, close_room  
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask_login import LoginManager, login_user, login_required, logout_user
 from flask_bcrypt import Bcrypt
 from topics import topics
+import time
+import atexit
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
+
+scheduler = BackgroundScheduler()
+scheduler.start()
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -26,6 +33,10 @@ bcrypt = Bcrypt(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+# Shut down the scheduler when exiting the app
+atexit.register(lambda: scheduler.shutdown())
+
 
 class User(db.Model):
     __tablename__ = "users"
@@ -75,16 +86,23 @@ class Message():
         self.system = system
 
     def json(self):
-    	return json.dumps({
+        return json.dumps({
             '_id': str(self.id),
             'text': str(self.text),
             'createdAt': self.createdAt,
             'system': str(self.system),
-        })
+            })
+
     
 
 if __name__ == '__main__':
     socketio.run(app)
+    scheduler.add_job(
+    trigger = IntervalTrigger(seconds=(3600*3)),
+    func = giveRooms(),
+    id = 'newRooms'
+    )
+
 
 @app.route('/')
 def index():
@@ -182,10 +200,16 @@ def on_join(data):
     emit('system', msg.json(), room=room)
 
 
-def giveRoom():
+def giveRooms(app):
     nUsers=db.session.query(User).order_by(User.id).count()
-    nRooms=math.ceil(nUsers/2)
-    roomspace=(list(range(1,nRooms+1))+list(range(1,nRooms+1)))
+    nRooms=math.ceil(nUsers/2)+1
+    for room in range(1,nRooms):
+        close_room(room)
+        print('closed',room)
+
+    roomspace=(list(range(1,nRooms))+list(range(1,nRooms)))
     for user in db.session.query(User).order_by(User.id):
         rooms[user.id]=rnd.choice(roomspace)
         print(user.id,rooms[user.id])
+
+
