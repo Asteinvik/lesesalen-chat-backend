@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, request, json
 from flask_socketio import SocketIO, send, emit
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -63,16 +63,22 @@ def load_user(id):
     '''
     return User.query.get(int(id))
 
-@socketio.on('register')
-def register(user_info):
-    # TODO: Validate input
-    username = user_info['username']
-    password = user_info['password']
-    email = user_info['email']
-    user = User(username, password, email)
-    db.session.add(user)
-    db.session.commit()
-    emit('message', 'Successfully registered user')
+@app.route('/register', methods=['POST'])
+def register():
+    if request.method == 'POST':
+        # TODO: Validate input
+        username = request.form['username']
+        password = request.form['password']
+        email = request.form['email']
+        user = User(username, password, email)
+        try:
+            db.session.add(user)
+            db.session.commit()
+            return json.dumps("{status: 200, message: 'Registered user'")
+        except:
+            return json.dumps("{status: 409, message: 'Username or email already exist'")
+    else:
+        return json.dumps("{status: 403, message: 'Only POST message supported for /register'")
 
 @app.route('/login', methods=['GET','POST'])
 def login():
