@@ -48,7 +48,6 @@ class User(db.Model):
         return '<User %r>' % (self.username)
 
 
-
 if __name__ == '__main__':
     socketio.run(app)
 
@@ -81,14 +80,26 @@ def register():
             return Response(js, status = 200, mimetype='application/json')
         except:
             js = json.dumps({
-                'status': 409
+                'status': 409,
                 'message': 'Username or email already exist'
             })
             return Response(js, status = 409, mimetype='application/json')
 
-@app.route('/login', methods=['GET','POST'])
+
+@app.route('/login',methods=['POST'])
 def login():
-    return 'login route'
+    username = request.form['username']
+    password = request.form['password']
+    registered_user = User.query.filter_by(username = username, password = password).first()
+    if registered_user is None:
+        js = json.dumps({
+            'status': 403,
+            'message': 'Invalid username or password'
+        })
+        return Response(js, status = 403, mimetype='application/json')
+    login_user(registered_user)
+    flash('Logged in successfully')
+    return redirect(request.args.get('next') or url_for('index'))
 
 @socketio.on('message')
 def handle_message(message):
