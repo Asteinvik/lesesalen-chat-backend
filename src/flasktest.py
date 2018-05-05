@@ -1,6 +1,7 @@
 import os
 import math
 import random as rnd
+import uuid
 from datetime import datetime
 from flask import Flask, render_template, request, json, Response, copy_current_request_context
 from flask_socketio import SocketIO, send, emit, join_room, leave_room, close_room  
@@ -80,9 +81,9 @@ class User(db.Model):
         return False
 
 class Message():
-    
-    def __init__(self,id,message,system=False):
-        self.id = id
+	
+    def __init__(self, message, system = False):
+        self.id = uuid.uuid4()
         self.createdAt = datetime.utcnow()
         self.text = message
         self.system = system
@@ -94,6 +95,7 @@ class Message():
             'createdAt': self.createdAt,
             'system': str(self.system),
             })
+
     
 
 if __name__ == '__main__':
@@ -182,11 +184,11 @@ def secure():
 
 @socketio.on('message')
 def handle_message(message):
-    emit('message', {'data': message}, broadcast=True, include_self=False)
+    emit('message', message, broadcast = True, include_self=False)
 
 @socketio.on('connect')
 def connect():
-    msg= Message(-1,'You are now connected',True)
+    msg = Message('You are now connected', True)
     emit('system', msg.json())
 
 
@@ -196,27 +198,11 @@ def on_join(data):
     user=db.session.query(User).filter_by(username=username).first()
     room = rooms[user.id]
     join_room(room)
-    msg= Message(-2,username+' has entered the room.',True)
+    msg = Message(username + ' has entered the room.', True)
     emit('system', msg.json(), room=room)
 
 
-#  @socketio.on('room_message')
-#  def handle_room_message(data):
-    #  username = data['username']
-    #  user=db.session.query(User).filter_by(username=username).first()
-    #  room = rooms[user.id]
-    #  join_room(room)
-    #  message_json = json.dumps({
-        #  '_id': '-1',
-        #  'text': username + ' has entered the room.',
-        #  'createdAt': datetime.utcnow(),
-        #  'system': 'true',
-    #  })
-    #  emit('system', message_json, room=room)
-
-
 def giveRooms(app):
-
     nUsers=db.session.query(User).order_by(User.id).count()
     nRooms=math.ceil(nUsers/2)+1
     for room in range(1,nRooms):
