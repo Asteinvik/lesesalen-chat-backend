@@ -1,14 +1,17 @@
 import os
+import math
+import random as rnd
 from datetime import datetime
 from flask import Flask, render_template, request, json, Response
-from flask_socketio import SocketIO, send, emit
+from flask_socketio import SocketIO, send, emit, join_room, leave_room
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask_login import LoginManager, login_user, login_required, logout_user
 from flask_bcrypt import Bcrypt
-import traceback
 
 DATABASE_URL = os.environ['DATABASE_URL']
+
+rooms=[]
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -153,3 +156,20 @@ def handle_message(message):
 def connect():
     id = 1
     emit('on_connect', {'data': 'You are connected. ID: %d' % id})
+
+@socketio.on('join')
+def on_join(data):
+    username = data['username']
+    user=db.session.query(User).filter_by(username=username).first()
+    room = rooms[user.id]
+    join_room(room)
+    send(username + ' has entered the room.', room=room)
+
+def giveRoom():
+    nUsers=db.session.query(User).order_by(User.id).count()
+    nRooms=math.ceil(nUsers/2)
+    roomspace=(list(range(1,nRooms+1))+list(range(1,nRooms+1)))
+    rooms=[0]*1000
+    for user in db.session.query(User).order_by(User.id):
+        rooms[user.id]=rnd.choice(roomspace)
+        print(user.id,rooms[user.id])
