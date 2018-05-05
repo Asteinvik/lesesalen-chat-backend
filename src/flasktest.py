@@ -144,7 +144,7 @@ def secure():
 
 @socketio.on('message')
 def handle_message(message):
-    emit('message', {'data': message}, broadcast=True, include_self=False)
+    emit('message', message, broadcast = True, include_self=False)
 
 @socketio.on('connect')
 def connect():
