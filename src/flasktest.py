@@ -154,7 +154,7 @@ def connect():
         'createdAt': datetime.utcnow(),
         'system': 'true',
     })
-    emit('system', message_json, room=room)
+    emit('system', message_json)
 
 
 @socketio.on('join')
