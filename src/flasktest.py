@@ -65,19 +65,19 @@ class User(db.Model):
 
 class Message():
 	
-    def __init__(self,id,message,system=False):
-        self.id = id
+    def __init__(self, message, system = False):
+        self.id = uuid.uuid4()
         self.createdAt = datetime.utcnow()
         self.text = message
         self.system = system
 
     def json(self):
     	return json.dumps({
-    		'_id': str(self.id),
-        	'text': str(self.text),
-        	'createdAt': self.createdAt,
-        	'system': str(self.system),
-    		})
+            '_id': str(self.id),
+            'text': str(self.text),
+            'createdAt': self.createdAt,
+            'system': str(self.system),
+        })
     
 
 if __name__ == '__main__':
@@ -164,7 +164,7 @@ def handle_message(message):
 
 @socketio.on('connect')
 def connect():
-    msg= Message(-1,'You are now connected',True)
+    msg = Message('You are now connected', True)
     emit('system', msg.json())
 
 
@@ -174,23 +174,8 @@ def on_join(data):
     user=db.session.query(User).filter_by(username=username).first()
     room = rooms[user.id]
     join_room(room)
-    msg= Message(-2,username+' has entered the room.',True)
+    msg = Message(username + ' has entered the room.', True)
     emit('system', msg.json(), room=room)
-
-
-#  @socketio.on('room_message')
-#  def handle_room_message(data):
-    #  username = data['username']
-    #  user=db.session.query(User).filter_by(username=username).first()
-    #  room = rooms[user.id]
-    #  join_room(room)
-    #  message_json = json.dumps({
-        #  '_id': '-1',
-        #  'text': username + ' has entered the room.',
-        #  'createdAt': datetime.utcnow(),
-        #  'system': 'true',
-    #  })
-    #  emit('system', message_json, room=room)
 
 
 def giveRoom():
