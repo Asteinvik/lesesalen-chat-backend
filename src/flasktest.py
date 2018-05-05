@@ -12,6 +12,13 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 socketio = SocketIO(app)
 db = SQLAlchemy(app)
 
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True,autoincrement=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    _password=db.Column(db.String(120))
+
+
 
 if __name__ == '__main__':
     socketio.run(app)
@@ -28,3 +35,6 @@ def handle_message(message):
 def connect():
     id = 1
     emit('on_connect', {'data': 'You are connected. ID: %d' % id})
+
+
+
