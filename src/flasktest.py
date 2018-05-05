@@ -63,6 +63,22 @@ class User(db.Model):
             return True
         return False
 
+class Message():
+	
+    def __init__(self,id,message,system=False):
+        self.id = id
+        self.createdAt =datetime.utcnow()
+        self.text = message
+        self.system=system
+
+    def json(self):
+    	return json.dumps({
+    		'_id': str(self.id),
+        	'text': str(self.text),
+        	'createdAt': self.createdAt,
+        	'system': str(self.system),
+    		})
+    
 
 if __name__ == '__main__':
     socketio.run(app)
