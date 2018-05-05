@@ -191,7 +191,7 @@ def connect():
 
 @socketio.on('join')
 def on_join(data):
-    random_topic = topics[randint(0, len(topics) - 1)])
+    random_topic = topics[randint(0, len(topics) - 1)]
     username = data['username']
     user=db.session.query(User).filter_by(username=username).first()
     room = rooms[user.id]
