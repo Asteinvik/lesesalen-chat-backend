@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template
 from flask_socketio import SocketIO, send, emit
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -11,6 +12,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 socketio = SocketIO(app)
 db = SQLAlchemy(app)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 class User(db.Model):
     __tablename__ = "users"
