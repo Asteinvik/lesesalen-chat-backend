@@ -1,8 +1,8 @@
 import os
-from flask import Flask, render_template, request, json
+from flask import Flask, render_template, request, json, Response
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
+from flask_login import LoginManager, login_user, login_required, logout_user
 from datetime import datetime
 import random as rnd
 import math
@@ -45,11 +45,10 @@ class User(db.Model):
         return False
  
     def get_id(self):
-        return unicode(self.id)
+        return str(self.id)
  
     def __repr__(self):
         return '<User %r>' % (self.username)
-
 
 
 if __name__ == '__main__':
@@ -77,15 +76,55 @@ def register():
         try:
             db.session.add(user)
             db.session.commit()
-            return json.dumps("{status: 200, message: 'Registered user'")
+            js = json.dumps({
+                'status': 200,
+                'message': 'Registered user %s' % username
+            })
+            return Response(js, status = 200, mimetype='application/json')
         except:
-            return json.dumps("{status: 409, message: 'Username or email already exist'")
-    else:
-        return json.dumps("{status: 403, message: 'Only POST message supported for /register'")
+            js = json.dumps({
+                'status': 409,
+                'message': 'Username or email already exist'
+            })
+            return Response(js, status = 409, mimetype='application/json')
 
-@app.route('/login', methods=['GET','POST'])
+
+@app.route('/login',methods=['POST'])
 def login():
-    return 'login route'
+    username = request.form['username']
+    password = request.form['password']
+    registered_user = User.query.filter_by(username = username, password = password).first()
+    if registered_user is None:
+        js = json.dumps({
+            'status': 403,
+            'message': 'Invalid username or password'
+        })
+        return Response(js, status = 403, mimetype='application/json')
+    login_user(registered_user)
+    js = json.dumps({
+        'status': 200,
+        'message': 'Login success',
+        'username': registered_user.username
+    })
+    return Response(js, status = 200, mimetype='application/json')
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    js = json.dumps({
+        'status': 200,
+        'message': 'Logged out'
+    })
+    return Response(js, status = 200, mimetype='application/json')
+
+@app.route('/secure')
+@login_required
+def secure():
+    js = json.dumps({
+        'status': 200,
+        'message': 'Here is some very secure data!'
+    })
+    return Response(js, status = 200, mimetype='application/json')
 
 @socketio.on('message')
 def handle_message(message):
