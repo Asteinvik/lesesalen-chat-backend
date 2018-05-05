@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, json
+from flask import Flask, render_template, request, json, Response
 from flask_socketio import SocketIO, send, emit
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -74,20 +74,17 @@ def register():
         try:
             db.session.add(user)
             db.session.commit()
-
-            data = {
-                    'message': 'Registered user %s' % username,
-                    'testField': 420
-                    }
-            js = json.dumps(data)
-            resp = Response(js, status = 200, mimetype='application/json')
-
-            return resp
-            #  return json.dumps("{status: 200, message: 'Registered user'")
+            js = json.dumps({
+                'message': 'Registered user %s' % username,
+                'testField': 420
+            })
+            return Response(js, status = 200, mimetype='application/json')
         except:
-            return json.dumps("{status: 409, message: 'Username or email already exist'")
-    else:
-        return json.dumps("{status: 403, message: 'Only POST message supported for /register'")
+            js = json.dumps({
+                'message': 'Username or email already exist',
+                'testField': 420
+            })
+            return Response(js, status = 409, mimetype='application/json')
 
 @app.route('/login', methods=['GET','POST'])
 def login():
