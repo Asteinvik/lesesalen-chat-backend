@@ -2,6 +2,7 @@ import os
 import math
 import random as rnd
 import uuid
+from random import randint
 from datetime import datetime
 from flask import Flask, render_template, request, json, Response
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
@@ -9,6 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask_login import LoginManager, login_user, login_required, logout_user
 from flask_bcrypt import Bcrypt
+from topics import topics
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -171,11 +173,12 @@ def connect():
 
 @socketio.on('join')
 def on_join(data):
+    random_topic topics[randint(0, len(topics) - 1)])
     username = data['username']
     user=db.session.query(User).filter_by(username=username).first()
     room = rooms[user.id]
     join_room(room)
-    msg = Message(username + ' has entered the room.', True)
+    msg = Message(username + ' has entered the room.\n' + random_topic, True)
     emit('system', msg.json(), room=room)
 
 
