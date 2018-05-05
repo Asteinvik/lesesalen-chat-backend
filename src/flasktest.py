@@ -148,8 +148,14 @@ def handle_message(message):
 
 @socketio.on('connect')
 def connect():
-    id = 1
-    emit('on_connect', {'data': 'You are connected. ID: %d' % id})
+    message_json = json.dumps({
+        '_id': '-1',
+        'text': 'You are now connected',
+        'createdAt': datetime.utcnow(),
+        'system': 'true',
+    })
+    emit('system', message_json, room=room)
+
 
 @socketio.on('join')
 def on_join(data):
