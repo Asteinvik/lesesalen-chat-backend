@@ -75,14 +75,14 @@ def register():
             db.session.add(user)
             db.session.commit()
             js = json.dumps({
-                'message': 'Registered user %s' % username,
-                'testField': 420
+                'status': 200,
+                'message': 'Registered user %s' % username
             })
             return Response(js, status = 200, mimetype='application/json')
         except:
             js = json.dumps({
-                'message': 'Username or email already exist',
-                'testField': 420
+                'status': 409
+                'message': 'Username or email already exist'
             })
             return Response(js, status = 409, mimetype='application/json')
 
