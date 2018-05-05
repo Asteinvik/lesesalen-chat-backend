@@ -163,7 +163,23 @@ def on_join(data):
         'createdAt': datetime.utcnow(),
         'system': 'true',
     })
-    send(message_json, room=room)
+    emit('system', message_json, room=room)
+
+
+#  @socketio.on('room_message')
+#  def handle_room_message(data):
+    #  username = data['username']
+    #  user=db.session.query(User).filter_by(username=username).first()
+    #  room = rooms[user.id]
+    #  join_room(room)
+    #  message_json = json.dumps({
+        #  '_id': '-1',
+        #  'text': username + ' has entered the room.',
+        #  'createdAt': datetime.utcnow(),
+        #  'system': 'true',
+    #  })
+    #  emit('system', message_json, room=room)
+
 
 def giveRoom():
     nUsers=db.session.query(User).order_by(User.id).count()
