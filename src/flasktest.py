@@ -1,14 +1,15 @@
+import functools
 import os
 import math
 import random as rnd
 import uuid
 from random import randint
 from datetime import datetime
-from flask import Flask, render_template, request, json, Response, copy_current_request_context
-from flask_socketio import SocketIO, send, emit, join_room, leave_room, close_room  
+from flask import Flask, render_template, request, json, Response, copy_current_request_context, request
+from flask_socketio import SocketIO, send, emit, join_room, leave_room, close_room, disconnect
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.hybrid import hybrid_property
-from flask_login import LoginManager, login_user, login_required, logout_user
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
 from topics import topics
 import time
@@ -93,20 +94,14 @@ class Message():
             'system': str(self.system),
             })
 
-    
 
 if __name__ == '__main__':
     socketio.run(app)
     scheduler.add_job(
-    trigger = IntervalTrigger(seconds=(3600*3)),
-    func = giveRooms(),
-    id = 'newRooms'
+        trigger = IntervalTrigger(seconds = (3600 * 3)),
+        func = giveRooms(),
+        id = 'newRooms'
     )
-
-
-@app.route('/')
-def index():
-    return ('hello world!')
 
 @login_manager.user_loader
 def load_user(id):
@@ -114,6 +109,10 @@ def load_user(id):
     Loads a User object based on id
     '''
     return User.query.get(int(id))
+
+@app.route('/')
+def index():
+    return ('hello world!')
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -170,26 +169,31 @@ def logout():
     })
     return Response(js, status = 200, mimetype='application/json')
 
-@app.route('/secure')
-@login_required
-def secure():
-    js = json.dumps({
-        'status': 200,
-        'message': 'Here is some very secure data!'
-    })
-    return Response(js, status = 200, mimetype='application/json')
-
-@socketio.on('message')
-def handle_message(message):
-    emit('message', message, broadcast = True, include_self=False)
+def authenticated_only(f):
+    '''
+    Custom decorator that disconnects non-authenticated users.
+    '''
+    @functools.wraps(f)
+    def wrapped(*args, **kwargs):
+        if not current_user.is_authenticated:
+            disconnect()
+        else:
+            return f(*args, **kwargs)
+    return wrapped
 
 @socketio.on('connect')
+@authenticated_only
 def connect():
     msg = Message('You are now connected', True)
     emit('system', msg.json())
 
+@socketio.on('message')
+@authenticated_only
+def handle_message(message):
+    emit('message', message, broadcast = True, include_self=False)
 
 @socketio.on('join')
+@authenticated_only
 def on_join(data):
     random_topic = topics[randint(0, len(topics) - 1)]
     username = data['username']
@@ -198,7 +202,6 @@ def on_join(data):
     join_room(room)
     msg = Message(username + ' has entered the room.\n' + random_topic, True)
     emit('system', msg.json(), room=room)
-
 
 def giveRooms(app):
     nUsers=db.session.query(User).order_by(User.id).count()
@@ -211,5 +214,4 @@ def giveRooms(app):
     for user in db.session.query(User).order_by(User.id):
         rooms[user.id]=rnd.choice(roomspace)
         print(user.id,rooms[user.id])
-
 
