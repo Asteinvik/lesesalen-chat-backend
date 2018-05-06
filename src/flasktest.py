@@ -155,7 +155,8 @@ def login():
             'status': 200,
             'message': 'Login success',
             'username': registered_user.username,
-            'id': registered_user.id
+            'id': registered_user.id,
+            'avatar': registered_user.avatar
         })
         return Response(js, status = 200, mimetype='application/json')
     else:
