@@ -98,7 +98,7 @@ class Message():
 if __name__ == '__main__':
     socketio.run(app)
     scheduler.add_job(
-    trigger = IntervalTrigger(seconds=(3600*3)),
+    trigger = IntervalTrigger(seconds=(60)),
     func = giveRooms(),
     id = 'newRooms'
     )
