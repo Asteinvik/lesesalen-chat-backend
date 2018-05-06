@@ -11,8 +11,6 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
-from flask_admin import Admin
-from flask_admin.contrib.sqla import ModelView
 from topics import topics
 import time
 import atexit
@@ -30,10 +28,12 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['BASIC_AUTH_USERNAME'] = os.environ['MEETSPIN_ADMIN_USERNAME']
+app.config['BASIC_AUTH_PASSWORD'] = os.environ['MEETSPIN_ADMIN_PASSWORD']
+
 socketio = SocketIO(app)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
-admin = Admin(app, name='Meetspin', template_mode='bootstrap3')
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -49,13 +49,15 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     _password = db.Column(db.String(128))
     registered_on = db.Column('registered_on' , db.DateTime)
+    avatar = db.Column(db.String(120), unique=False, nullable=True)
 
-    def __init__(self, username, password, email):
+    def __init__(self, username, password, email, avatar):
         self.username = username
         bvalue = bytes(password, 'utf-8')
         self._password = bcrypt.generate_password_hash(bvalue).decode('utf-8')
         self.email = email
         self.registered_on = datetime.utcnow()
+        self.avatar = avatar
  
     def is_authenticated(self):
         return True
@@ -80,8 +82,6 @@ class User(db.Model):
         if bcrypt.check_password_hash(self._password.encode('utf-8'), plaintext.encode('utf-8')):
             return True
         return False
-
-admin.add_view(ModelView(User, db.session))
 
 class Message():
 	
@@ -126,7 +126,8 @@ def register():
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
-        user = User(username=username, password=password, email=email)
+        avatar = request.form['avatar']
+        user = User(username=username, password=password, email=email, avatar=avatar)
         try:
             db.session.add(user)
             db.session.commit()
