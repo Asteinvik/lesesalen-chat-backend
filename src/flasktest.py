@@ -207,7 +207,7 @@ def on_join(data):
     user=db.session.query(User).filter_by(username=username).first()
     room = rooms[user.id]
     join_room(room)
-    msg = Message(username + ' has entered the room.\n' + random_topic, True)
+    msg = Message(username + ' has entered room ' + room + '. ' + random_topic, True)
     emit('system', msg.json(), room=room)
 
 def giveRooms(app):
