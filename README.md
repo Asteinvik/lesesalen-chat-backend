@@ -1,3 +1,6 @@
+This is the backend for [https://github.com/JosteinKringlen/lesesalen-chat-frontend](https://github.com/JosteinKringlen/lesesalen-chat-frontend)
+
+
 ## Configuration
 Add environment variables:
 `FLASK_APP = <absolute-path-to-flasktest.py>`

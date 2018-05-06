@@ -1,4 +1,4 @@
-import os
+    import os
 import math
 import random as rnd
 import uuid
@@ -98,9 +98,9 @@ class Message():
 if __name__ == '__main__':
     socketio.run(app)
     scheduler.add_job(
-    trigger = IntervalTrigger(seconds=(60)),
-    func = giveRooms(),
-    id = 'newRooms'
+        trigger = IntervalTrigger(seconds=(3600*3)),
+        func = giveRooms(),
+        id = 'newRooms'
     )
 
 
@@ -208,8 +208,11 @@ def giveRooms(app):
         print('closed',room)
 
     roomspace=(list(range(1,nRooms))+list(range(1,nRooms)))
+    i=0
+    roomspace=rnd.shuffle(roomspace)
     for user in db.session.query(User).order_by(User.id):
-        rooms[user.id]=rnd.choice(roomspace)
+        rooms[user.id]=roomspace[0]
+        i=i+1
         print(user.id,rooms[user.id])
 
 
