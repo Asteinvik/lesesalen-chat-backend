@@ -11,6 +11,8 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
 from topics import topics
 import time
 import atexit
@@ -31,6 +33,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 socketio = SocketIO(app)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
+admin = Admin(app, name='Meetspin', template_mode='bootstrap3')
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -77,6 +80,8 @@ class User(db.Model):
         if bcrypt.check_password_hash(self._password.encode('utf-8'), plaintext.encode('utf-8')):
             return True
         return False
+
+admin.add_view(ModelView(User, db.session))
 
 class Message():
 	
