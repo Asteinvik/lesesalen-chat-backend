@@ -28,8 +28,6 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['BASIC_AUTH_USERNAME'] = os.environ['MEETSPIN_ADMIN_USERNAME']
-app.config['BASIC_AUTH_PASSWORD'] = os.environ['MEETSPIN_ADMIN_PASSWORD']
 
 socketio = SocketIO(app)
 db = SQLAlchemy(app)
