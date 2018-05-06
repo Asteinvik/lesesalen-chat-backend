@@ -16,6 +16,7 @@ psycopg2 = "*"
 flask-login = "*"
 flask-bcrypt = "*"
 apscheduler = "*"
+flask-admin = "*"
 
 [requires]
 python_version = "3.5"
