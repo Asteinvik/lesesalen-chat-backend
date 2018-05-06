@@ -205,11 +205,7 @@ def on_join(data):
     user=db.session.query(User).filter_by(username=username).first()
     room = rooms[user.id]
     join_room(room)
-<<<<<<< HEAD
-    msg = Message(username + ' has entered room '+room+'.\n' + random_topic, True)
-=======
     msg = Message(username + ' has entered room ' + str(room) + '. ' + random_topic, True)
->>>>>>> 6b3390bfc32c017a267c72cfed52fa6f69b8cba1
     emit('system', msg.json(), room=room)
 
 def giveRooms(app):
@@ -219,8 +215,10 @@ def giveRooms(app):
         close_room(room)
         print('closed',room)
 
-    roomspace=(list(range(1,nRooms))+list(range(1,nRooms)))
+    i=0
+    roomspace=rnd.shuffle(list(range(1,nRooms))+list(range(1,nRooms)))
     for user in db.session.query(User).order_by(User.id):
-        rooms[user.id]=rnd.choice(roomspace)
+        rooms[user.id]=roomspace[0]
+        i=i+1
         print(user.id,rooms[user.id])
 
