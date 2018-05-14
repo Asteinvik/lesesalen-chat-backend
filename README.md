@@ -12,3 +12,8 @@ pipenv install
 
 ## Run:
 flask run
+
+## Authors:
+[@Asteinvik](https://github.com/Asteinvik), [@andrmos](https://github.com/andrmos), [@JosteinKringlen](https://github.com/JosteinKringlen)
+
+
